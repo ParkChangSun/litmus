@@ -16,30 +16,30 @@ type GitMutexLock struct {
 
 // Lock acquires a lock on particular project or repo for access
 func (g *GitMutexLock) Lock(repo string, branch *string) {
-	key := getKey(repo, branch)
+	tree := getKey(repo, branch)
 
 	g.mapMutex.Lock()
-	if _, ok := g.gitMutex[key]; !ok {
-		g.gitMutex[key] = &sync.Mutex{}
+	if _, ok := g.gitMutex[tree]; !ok {
+		g.gitMutex[tree] = &sync.Mutex{}
 	}
-	temp := g.gitMutex[key]
+	temp := g.gitMutex[tree]
 	g.mapMutex.Unlock()
 
 	temp.Lock()
-	log.Info("acquired LOCK : ", key)
+	log.Info("acquired LOCK : ", tree)
 }
 
 // Unlock releases the lock on particular project or repo
 func (g *GitMutexLock) Unlock(repo string, branch *string) {
-	key := getKey(repo, branch)
+	tree := getKey(repo, branch)
 	g.mapMutex.Lock()
-	if _, ok := g.gitMutex[key]; !ok {
+	if _, ok := g.gitMutex[tree]; !ok {
 		return
 	}
-	temp := g.gitMutex[key]
+	temp := g.gitMutex[tree]
 	g.mapMutex.Unlock()
 	temp.Unlock()
-	log.Info("release LOCK : ", key)
+	log.Info("release LOCK : ", tree)
 }
 
 // NewGitLock returns a instance of GitMutexLock
